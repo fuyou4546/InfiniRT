@@ -40,11 +40,18 @@ Current backend capabilities are:
 | Moore | Yes | Yes | No | Yes | Yes | Yes | Yes |
 | Hygon | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 | Cambricon | Yes | No | No | No | Yes | No | Yes |
-| Ascend | Yes | No | No | No | Yes | No | Yes |
+| Ascend | Yes | No | No | No | Yes | No | Yes* |
 | T-Head | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 
 Treat a non-`kSuccess` status as the portable way to detect unsupported
 operations.
+
+\* Ascend Graph capture and replay require the runtime `aclmdlRI*` symbols
+(`aclmdlRICaptureBegin`, `aclmdlRICaptureGetInfo`, `aclmdlRICaptureEnd`,
+`aclmdlRIExecuteAsync`, and `aclmdlRIDestroy`). The Graph replay test is
+registered for Ascend builds and passes on CANN 9.0 with 910B hardware. On a
+CANN installation without these symbols, the runtime reports Graph capture as
+unsupported.
 
 ## Header Dependencies
 
