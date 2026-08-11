@@ -15,6 +15,7 @@ _DEVICE_HEADERS = {
         ("nvidia", "data_type_.h", "native/cuda/nvidia/data_type_.h"),
         ("nvidia", "device_.h", "native/cuda/nvidia/device_.h"),
         ("nvidia", "runtime_.h", "native/cuda/nvidia/runtime_.h"),
+        ("nvidia", "driver_.h", "native/cuda/nvidia/driver_.h"),
     ),
     "iluvatar": (
         ("iluvatar", "data_type_.h", "native/cuda/iluvatar/data_type_.h"),
@@ -116,7 +117,7 @@ def _rewrite_detail_include(match):
 
 
 _DETAIL_INCLUDE_PATTERN = re.compile(
-    r'#include "((?:common|native)/[^"]+|data_type\.h|device\.h|dispatcher\.h|hash\.h|runtime\.h|tensor_view\.h)"'
+    r'#include "((?:common|native)/[^"]+|data_type\.h|device\.h|dispatcher\.h|driver\.h|hash\.h|runtime\.h|tensor_view\.h)"'
 )
 
 
@@ -148,6 +149,7 @@ def _write_detail_headers(include_root, source_root, devices):
         "data_type.h",
         "device.h",
         "dispatcher.h",
+        "driver.h",
         "hash.h",
         "runtime.h",
         "tensor_view.h",
@@ -200,6 +202,7 @@ enum class StreamCaptureMode {
         "#include <type_traits>",
         f"#include {_detail_include('data_type.h')}",
         f"#include {_detail_include('device.h')}",
+        f"#include {_detail_include('driver.h')}",
         f"#include {_detail_include('hash.h')}",
         f"#include {_detail_include('runtime.h')}",
         f"#include {_detail_include('tensor_view.h')}",
@@ -210,6 +213,10 @@ enum class StreamCaptureMode {
 
     for device in devices:
         includes.append(f"#include <infini/rt/{device}/runtime_.h>")
+
+    for device in devices:
+        if any(h == "driver_.h" for _, h, _ in _DEVICE_HEADERS[device]):
+            includes.append(f"#include <infini/rt/{device}/driver_.h>")
 
     runtime_declarations = "\n\n".join(
         f"{function.signature()};" for function in public_runtime_functions
