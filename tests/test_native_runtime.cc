@@ -94,6 +94,52 @@ void TestDevice(infini::rt::test::TestContext* context) {
                   " runtime should report at least one device.");
 }
 
+void TestDeviceGetAttribute(infini::rt::test::TestContext* context) {
+#if INFINI_RT_TEST_SUPPORTS_DEVICE_GET_ATTRIBUTE
+  int warp_size = 0;
+  ExpectSuccess(context,
+                Runtime::DeviceGetAttribute(&warp_size,
+                                            Runtime::kDevAttrWarpSize, 0),
+                INFINI_RT_TEST_BACKEND_NAME
+                " runtime should get warp size attribute.");
+  context->Expect(warp_size > 0, INFINI_RT_TEST_BACKEND_NAME
+                  " runtime warp size should be positive.");
+
+  int compute_capability_major = 0;
+  ExpectSuccess(context,
+                Runtime::DeviceGetAttribute(
+                    &compute_capability_major,
+                    Runtime::kDevAttrComputeCapabilityMajor, 0),
+                INFINI_RT_TEST_BACKEND_NAME
+                " runtime should get compute capability major attribute.");
+  context->Expect(compute_capability_major >= 0, INFINI_RT_TEST_BACKEND_NAME
+                  " runtime compute capability major should be non-negative.");
+
+  int compute_capability_minor = 0;
+  ExpectSuccess(context,
+                Runtime::DeviceGetAttribute(
+                    &compute_capability_minor,
+                    Runtime::kDevAttrComputeCapabilityMinor, 0),
+                INFINI_RT_TEST_BACKEND_NAME
+                " runtime should get compute capability minor attribute.");
+  context->Expect(compute_capability_minor >= 0, INFINI_RT_TEST_BACKEND_NAME
+                  " runtime compute capability minor should be non-negative.");
+
+  int max_shared_memory_per_block_optin = 0;
+  ExpectSuccess(context,
+                Runtime::DeviceGetAttribute(
+                    &max_shared_memory_per_block_optin,
+                    Runtime::kDevAttrMaxSharedMemoryPerBlockOptin, 0),
+                INFINI_RT_TEST_BACKEND_NAME
+                " runtime should get max shared memory per block optin "
+                "attribute.");
+  context->Expect(max_shared_memory_per_block_optin > 0,
+                  INFINI_RT_TEST_BACKEND_NAME
+                  " runtime max shared memory per block optin should be "
+                  "positive.");
+#endif
+}
+
 void TestMallocAndFree(infini::rt::test::TestContext* context) {
   void* ptr = nullptr;
   ExpectSuccess(context, Runtime::Malloc(&ptr, 16),
@@ -468,6 +514,7 @@ int main() {
   }
 
   TestDevice(&context);
+  TestDeviceGetAttribute(&context);
   TestMallocAndFree(&context);
   TestHostMemory(&context);
   TestAsyncMemory(&context);

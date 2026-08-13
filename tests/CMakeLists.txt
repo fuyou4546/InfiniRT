@@ -9,7 +9,7 @@ endfunction()
 function(add_infini_rt_backend_runtime_test backend device_type runtime_header
          expect_async_memcpy_success supports_host_memory supports_async_memory
          supports_mem_get_info supports_memset_async supports_stream_wait_event
-         supports_event supports_event_elapsed_time)
+         supports_event supports_event_elapsed_time supports_device_get_attribute)
     string(TOLOWER "${backend}" backend_lower)
     set(target "test_${backend_lower}_runtime")
     add_infini_rt_test(${target} test_native_runtime.cc)
@@ -25,7 +25,8 @@ function(add_infini_rt_backend_runtime_test backend device_type runtime_header
             "INFINI_RT_TEST_SUPPORTS_MEMSET_ASYNC=${supports_memset_async}"
             "INFINI_RT_TEST_SUPPORTS_STREAM_WAIT_EVENT=${supports_stream_wait_event}"
             "INFINI_RT_TEST_SUPPORTS_EVENT=${supports_event}"
-            "INFINI_RT_TEST_SUPPORTS_EVENT_ELAPSED_TIME=${supports_event_elapsed_time}")
+            "INFINI_RT_TEST_SUPPORTS_EVENT_ELAPSED_TIME=${supports_event_elapsed_time}"
+            "INFINI_RT_TEST_SUPPORTS_DEVICE_GET_ATTRIBUTE=${supports_device_get_attribute}")
 endfunction()
 
 function(add_infini_rt_backend_graph_test backend device_type supports_graph_capture)
@@ -55,7 +56,7 @@ if(WITH_CPU)
     set(INFINI_RT_TEST_HAS_RUNTIME_BACKEND ON)
     add_infini_rt_backend_runtime_test(
         CPU infini::rt::Device::Type::kCpu infini/rt/cpu/runtime_.h
-        0 1 0 1 0 1 1 1)
+        0 1 0 1 0 1 1 1 0)
 endif()
 
 if(WITH_NVIDIA)
@@ -63,7 +64,7 @@ if(WITH_NVIDIA)
     add_infini_rt_backend_runtime_test(
         NVIDIA infini::rt::Device::Type::kNvidia
         infini/rt/nvidia/runtime_.h
-        1 1 1 1 1 1 1 1)
+        1 1 1 1 1 1 1 1 1)
     add_infini_rt_backend_graph_test(
         NVIDIA infini::rt::Device::Type::kNvidia 1)
 endif()
@@ -73,7 +74,7 @@ if(WITH_ILUVATAR)
     add_infini_rt_backend_runtime_test(
         ILUVATAR infini::rt::Device::Type::kIluvatar
         infini/rt/iluvatar/runtime_.h
-        1 1 1 1 1 1 1 1)
+        1 1 1 1 1 1 1 1 0)
     add_infini_rt_backend_graph_test(
         ILUVATAR infini::rt::Device::Type::kIluvatar 1)
 endif()
@@ -83,7 +84,7 @@ if(WITH_HYGON)
     add_infini_rt_backend_runtime_test(
         HYGON infini::rt::Device::Type::kHygon
         infini/rt/hygon/runtime_.h
-        1 1 1 1 1 1 1 1)
+        1 1 1 1 1 1 1 1 0)
     add_infini_rt_backend_graph_test(
         HYGON infini::rt::Device::Type::kHygon 1)
 endif()
@@ -93,7 +94,7 @@ if(WITH_THEAD)
     add_infini_rt_backend_runtime_test(
         THEAD infini::rt::Device::Type::kThead
         infini/rt/thead/runtime_.h
-        1 1 1 1 1 1 1 1)
+        1 1 1 1 1 1 1 1 0)
     add_infini_rt_backend_graph_test(
         THEAD infini::rt::Device::Type::kThead 1)
 endif()
@@ -103,7 +104,7 @@ if(WITH_METAX)
     add_infini_rt_backend_runtime_test(
         METAX infini::rt::Device::Type::kMetax
         infini/rt/metax/runtime_.h
-        1 1 1 1 1 1 1 1)
+        1 1 1 1 1 1 1 1 0)
     add_infini_rt_backend_graph_test(
         METAX infini::rt::Device::Type::kMetax 1)
 endif()
@@ -113,7 +114,7 @@ if(WITH_MARS)
     add_infini_rt_backend_runtime_test(
         MARS infini::rt::Device::Type::kMars
         infini/rt/mars/runtime_.h
-        1 1 1 1 1 1 1 1)
+        1 1 1 1 1 1 1 1 0)
     add_infini_rt_backend_graph_test(
         MARS infini::rt::Device::Type::kMars 1)
 endif()
@@ -123,7 +124,7 @@ if(WITH_MOORE)
     add_infini_rt_backend_runtime_test(
         MOORE infini::rt::Device::Type::kMoore
         infini/rt/moore/runtime_.h
-        1 1 0 1 1 1 1 1)
+        1 1 0 1 1 1 1 1 0)
     add_infini_rt_backend_graph_test(
         MOORE infini::rt::Device::Type::kMoore 1)
 endif()
@@ -133,7 +134,7 @@ if(WITH_CAMBRICON)
     add_infini_rt_backend_runtime_test(
         CAMBRICON infini::rt::Device::Type::kCambricon
         infini/rt/cambricon/runtime_.h
-        1 0 0 0 1 0 0 0)
+        1 0 0 0 1 0 0 0 0)
     add_infini_rt_backend_graph_test(
         CAMBRICON infini::rt::Device::Type::kCambricon 1)
 endif()
@@ -143,7 +144,7 @@ if(WITH_ASCEND)
     add_infini_rt_backend_runtime_test(
         ASCEND infini::rt::Device::Type::kAscend
         infini/rt/ascend/runtime_.h
-        1 0 0 0 1 0 0 0)
+        1 0 0 0 1 0 0 0 0)
     add_infini_rt_backend_graph_test(
         ASCEND infini::rt::Device::Type::kAscend 1)
 endif()
