@@ -27,7 +27,7 @@ if(WITH_NVIDIA)
     target_compile_definitions(infinirt PUBLIC WITH_NVIDIA=1)
 
     find_package(CUDAToolkit REQUIRED)
-    target_link_libraries(infinirt PUBLIC CUDA::cudart)
+    target_link_libraries(infinirt PUBLIC CUDA::cudart CUDA::cuda_driver)
 
     set_target_properties(infinirt PROPERTIES
         CUDA_STANDARD 17

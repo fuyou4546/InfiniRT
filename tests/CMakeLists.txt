@@ -39,6 +39,19 @@ function(add_infini_rt_backend_graph_test backend device_type supports_graph_cap
             "INFINI_RT_TEST_SUPPORTS_GRAPH_CAPTURE=${supports_graph_capture}")
 endfunction()
 
+function(add_infini_rt_backend_driver_test backend device_type
+         driver_header runtime_header)
+	string(TOLOWER "${backend}" backend_lower)
+	set(target "test_${backend_lower}_driver")
+	add_infini_rt_test(${target} test_native_driver.cc)
+	target_compile_definitions(${target}
+		PRIVATE
+			"INFINI_RT_TEST_BACKEND_NAME=\"${backend}\""
+			"INFINI_RT_TEST_DEVICE_TYPE=${device_type}"
+			"INFINI_RT_TEST_DRIVER_HEADER=\"${driver_header}\""
+			"INFINI_RT_TEST_RUNTIME_HEADER=\"${runtime_header}\"")
+endfunction()
+
 add_infini_rt_test(test_smoke test_smoke.cc)
 add_infini_rt_test(test_core test_core.cc)
 add_infini_rt_test(test_small_vector test_small_vector.cc)
@@ -66,6 +79,31 @@ if(WITH_NVIDIA)
         1 1 1 1 1 1 1 1)
     add_infini_rt_backend_graph_test(
         NVIDIA infini::rt::Device::Type::kNvidia 1)
+    add_infini_rt_backend_driver_test(
+        NVIDIA infini::rt::Device::Type::kNvidia
+        infini/rt/nvidia/driver_.h
+        infini/rt/nvidia/runtime_.h)
+
+    execute_process(
+        COMMAND ${Python_EXECUTABLE} -c "import triton"
+        RESULT_VARIABLE INFINI_RT_TEST_TRITON_RESULT)
+    if(INFINI_RT_TEST_TRITON_RESULT EQUAL 0)
+        set(INFINI_RT_TEST_TRITON_KERNEL_FILE
+            "${CMAKE_BINARY_DIR}/generated/empty_kernel")
+        add_test(NAME test_nvidia_driver_triton_kernel
+            COMMAND ${Python_EXECUTABLE}
+                ${CMAKE_SOURCE_DIR}/scripts/compile_triton_kernel.py
+                --output ${INFINI_RT_TEST_TRITON_KERNEL_FILE})
+        set_tests_properties(test_nvidia_driver_triton_kernel PROPERTIES
+            FIXTURES_SETUP triton_kernel)
+        set_tests_properties(test_nvidia_driver PROPERTIES
+            FIXTURES_REQUIRED triton_kernel)
+        target_compile_definitions(test_nvidia_driver PRIVATE
+            INFINI_RT_TEST_HAS_TRITON_KERNEL=1
+            "INFINI_RT_TEST_TRITON_KERNEL_FILE=\"${INFINI_RT_TEST_TRITON_KERNEL_FILE}\"")
+    else()
+        message(STATUS "Triton unavailable; skipping driver kernel-lifecycle test.")
+    endif()
 endif()
 
 if(WITH_ILUVATAR)
